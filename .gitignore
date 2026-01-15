@@ -1,0 +1,31 @@
+# --- Python Geral ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Ambientes Virtuais (Virtual Envs) ---
+# Ignora a pasta onde as bibliotecas são instaladas
+venv/
+env/
+.venv/
+
+# --- Banco de Dados ---
+# Ignora o banco de dados local para não expor dados reais
+*.db
+*.sqlite3
+
+# --- Arquivos Gerados pelo Sistema ---
+# Ignora os PDFs de relatório gerados
+*.pdf
+
+# --- Variáveis de Ambiente e Segredos ---
+# Caso você use .env no futuro para guardar senhas
+.env
+
+# --- IDEs e Editores (Opcional, mas recomendado) ---
+.vscode/
+.idea/
+
+# --- Sistema Operacional ---
+.DS_Store
+Thumbs.db

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h3 class="text-secondary"><i class="fas fa-th-large"></i> Painel de Controle</h3>
+    </div>
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar chave por nome ou número...">
+        </div>
+    </div>
+</div>
+<ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ 'active' if tab_ativa == 'chaves' else '' }}" 
+                id="chaves-tab" data-bs-toggle="tab" data-bs-target="#chaves" type="button" role="tab">
+            <i class="fas fa-key"></i> Chaves
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ 'active' if tab_ativa == 'historico' else '' }}" 
+                id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
+            <i class="fas fa-list-alt"></i> Histórico
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+
+    <div class="tab-pane fade {{ 'show active' if tab_ativa == 'chaves' else '' }}" id="chaves" role="tabpanel">
+        <div class="row" id="keysGrid">
+            {% for chave in chaves %}
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4 key-card-container">
+                <div class="card h-100 shadow-sm border-0 position-relative">
+                    <div class="position-absolute top-0 end-0 m-2">
+                        {% if chave.status == 'Disponivel' %}
+                            <span class="badge rounded-pill bg-success" title="Disponível"><i class="fas fa-check"></i></span>
+                        {% elif chave.status == 'Em Uso' %}
+                            <span class="badge rounded-pill bg-danger" title="Em Uso"><i class="fas fa-user"></i></span>
+                        {% elif chave.status == 'Pendente' %}
+                            <span class="badge rounded-pill bg-warning text-dark" title="Pendente"><i class="fas fa-exclamation"></i></span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-key fa-3x {% if chave.status == 'Disponivel' %}text-success{% elif chave.status == 'Em Uso' %}text-danger opacity-50{% else %}text-warning{% endif %}"></i>
+                        </div>
+                        <h5 class="card-title fw-bold text-dark key-name">{{ chave.nome }}</h5>
+                        <p class="card-text mb-3">
+                            {% if chave.status == 'Disponivel' %}
+                                <small class="text-success fw-bold">Disponível</small>
+                            {% elif chave.status == 'Em Uso' %}
+                                <small class="text-muted">Retirado por:</small><br><strong>{{ mov_ativas.get(chave.id, '...') }}</strong>
+                            {% elif chave.status == 'Pendente' %}
+                                <small class="text-warning fw-bold">Aguardando Confirmação</small>
+                            {% endif %}
+                        </p>
+                        <div class="d-grid gap-2">
+                            {% if chave.status == 'Disponivel' %}
+                                <form action="{{ url_for('retirar', chave_id=chave.id) }}" method="POST"><button class="btn btn-outline-success btn-sm w-100 rounded-pill">Retirar</button></form>
+                            {% elif chave.status == 'Em Uso' %}
+                                <form action="{{ url_for('devolver', chave_id=chave.id) }}" method="POST"><button class="btn btn-outline-danger btn-sm w-100 rounded-pill">Devolver</button></form>
+                            {% elif chave.status == 'Pendente' %}
+                                {% if current_user.tipo == 'Admin' %}
+                                    <form action="{{ url_for('confirmar', chave_id=chave.id) }}" method="POST"><button class="btn btn-primary btn-sm w-100 rounded-pill">Confirmar</button></form>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm w-100 rounded-pill" disabled>Aguardando</button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div id="noResults" class="col-12 text-center text-muted d-none mt-5"><p>Nenhuma chave encontrada.</p></div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {{ 'show active' if tab_ativa == 'historico' else '' }}" id="historico" role="tabpanel">
+        
+        <div class="card bg-light border-0 mb-3">
+            <div class="card-body py-3">
+                <form method="GET" action="{{ url_for('index') }}" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Data Início</label>
+                        <input type="date" name="data_inicio" class="form-control" value="{{ request.args.get('data_inicio', '') }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Data Fim</label>
+                        <input type="date" name="data_fim" class="form-control" value="{{ request.args.get('data_fim', '') }}" required>
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                        
+                        <button type="submit" formaction="{{ url_for('exportar_pdf') }}" class="btn btn-danger" title="Baixar PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+
+                        {% if request.args.get('data_inicio') %}
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary" title="Limpar Filtros">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Chave</th>
+                            <th>Quem Retirou</th>
+                            <th>Retirada</th>
+                            <th>Devolução</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mov in historico %}
+                        <tr>
+                            <td class="fw-bold">{{ mov.chave.nome }}</td>
+                            <td>{{ mov.usuario_nome }}</td>
+                            <td>{{ mov.data_retirada.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if mov.data_devolucao %}
+                                    {{ mov.data_devolucao.strftime('%d/%m/%Y %H:%M') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if mov.data_devolucao %}
+                                    <span class="badge bg-secondary">Concluído</span>
+                                {% else %}
+                                    <span class="badge bg-primary">Em Aberto</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum registro encontrado neste período.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let cards = document.getElementsByClassName('key-card-container');
+        let hasResults = false;
+
+        for (let i = 0; i < cards.length; i++) {
+            let cardName = cards[i].getElementsByClassName('key-name')[0].innerText.toLowerCase();
+            
+            if (cardName.indexOf(filter) > -1) {
+                cards[i].style.display = ""; // Mostra
+                hasResults = true;
+            } else {
+                cards[i].style.display = "none"; // Esconde
+            }
+        }
+        
+        // Mostra mensagem se não achar nada
+        document.getElementById('noResults').classList.toggle('d-none', hasResults);
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+============================================================
+       GUIA RÁPIDO - SISTEMA DE CLAVICULÁRIO DIGITAL
+============================================================
+
+1. PRÉ-REQUISITOS
+------------------------------------------------------------
+- Certifique-se de ter o Python instalado na sua máquina.
+
+
+2. INSTALAÇÃO DAS BIBLIOTECAS
+------------------------------------------------------------
+Abra o terminal (CMD ou PowerShell) dentro da pasta do projeto 
+e execute o comando abaixo para instalar tudo de uma vez:
+
+   pip install flask flask-sqlalchemy flask-login fpdf
+
+
+3. COMO INICIAR O SERVIDOR
+------------------------------------------------------------
+No terminal, execute o comando:
+
+   python app.py
+
+(O terminal mostrará que o servidor está rodando na porta 5000).
+
+
+4. CONFIGURAÇÃO INICIAL (Apenas na primeira vez)
+------------------------------------------------------------
+Para criar o Banco de Dados automaticamente, abra o seu 
+navegador e acesse o seguinte link:
+
+   http://127.0.0.1:5000/setup
+
+Você verá uma mensagem confirmando "Banco resetado!".
+
+
+5. COMO ACESSAR
+------------------------------------------------------------
+Após a configuração, acesse a página inicial do sistema:
+
+   http://127.0.0.1:5000/
+
+
+6. DADOS DE ACESSO (LOGINS PADRÃO)
+------------------------------------------------------------
+
+[ ADMINISTRADOR ] 
+(Permissão total: retira, devolve, cadastra usuários, gera PDF)
+- E-mail: admin@escola.com
+- Senha:  123
+
+[ FUNCIONÁRIO ]
+(Permissão limitada: retira e solicita devolução)
+- E-mail: joao@escola.com
+- Senha:  123
+
+============================================================

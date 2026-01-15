@@ -35,6 +35,17 @@
             {% for chave in chaves %}
             <div class="col-xl-3 col-lg-4 col-md-6 mb-4 key-card-container">
                 <div class="card h-100 shadow-sm border-0 position-relative">
+
+                    {% if current_user.tipo == 'Admin' and chave.status == 'Disponivel' %}
+                    <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                        <form action="{{ url_for('excluir_chave', chave_id=chave.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta chave permanentemente?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 bg-white shadow-sm" title="Excluir Chave">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+
                     <div class="position-absolute top-0 end-0 m-2">
                         {% if chave.status == 'Disponivel' %}
                             <span class="badge rounded-pill bg-success" title="Disponível"><i class="fas fa-check"></i></span>
@@ -125,8 +136,14 @@
                     </thead>
                     <tbody>
                         {% for mov in historico %}
-                        <tr>
-                            <td class="fw-bold">{{ mov.chave.nome }}</td>
+                        <tr>                           
+                            <td>
+                                {% if mov.chave %}
+                                    {{ mov.chave.nome }}
+                                {% else %}
+                                    <span class="text-muted fst-italic">Chave Excluída</span>
+                                {% endif %}
+                            </td>                                               
                             <td>{{ mov.usuario_nome }}</td>
                             <td>{{ mov.data_retirada.strftime('%d/%m/%Y %H:%M') }}</td>
                             <td>

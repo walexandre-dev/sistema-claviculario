@@ -302,5 +302,57 @@ def exportar_pdf():
     response.headers['Content-Disposition'] = 'attachment; filename=relatorio_chaves.pdf'
     return response
 
+#--- CADASTRO DE NOVA CHAVE ---
+# Rota para cadastrar nova chave (Apenas Admin)
+@app.route('/chaves/nova', methods=['GET', 'POST'])
+@login_required
+def nova_chave():
+    # 1. Segurança: Apenas Admin
+    if current_user.tipo != 'Admin':
+        flash('Acesso negado. Apenas administradores podem cadastrar chaves.', 'danger')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        
+        # 2. Validação simples
+        if not nome:
+            flash('O nome da chave é obrigatório.', 'warning')
+        else:
+            nova_chave = Chave(nome=nome, status='Disponivel')
+            db.session.add(nova_chave)
+            db.session.commit()
+            flash(f'Chave "{nome}" cadastrada com sucesso!', 'success')
+            return redirect(url_for('index'))
+
+    return render_template('cadastro_chave.html')
+
+#--- EXCLUSÃO DE CHAVE ---
+@app.route('/chaves/excluir/<int:chave_id>', methods=['POST'])
+@login_required
+def excluir_chave(chave_id):
+    # 1. Segurança: Apenas Admin
+    if current_user.tipo != 'Admin':
+        flash('Acesso negado.', 'danger')
+        return redirect(url_for('index'))
+
+    chave = Chave.query.get_or_404(chave_id)
+
+    # 2. Validação: Chave deve estar Disponível
+    if chave.status != 'Disponivel':
+        flash('Não é possível excluir uma chave que está em uso ou pendente.', 'warning')
+        return redirect(url_for('index'))
+
+    # 3. Exclusão
+    try:
+        db.session.delete(chave)
+        db.session.commit()
+        flash(f'Chave "{chave.nome}" excluída com sucesso!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao excluir. Talvez existam registros de histórico vinculados a ela.', 'danger')
+
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True)

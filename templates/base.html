@@ -20,9 +20,14 @@
                     </span>
 
                     {% if current_user.tipo == 'Admin' %}
-                        <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-success me-2" title="Cadastrar Usuário">
-                            <i class="fas fa-user-plus"></i> <span class="d-none d-md-inline">Novo Usuário</span>
-                        </a>
+                        <div class="btn-group me-3">
+                            <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-outline-light" title="Novo Usuário">
+                                <i class="fas fa-user-plus"></i> <span class="d-none d-md-inline">Usuário</span>
+                            </a>
+                            <a href="{{ url_for('nova_chave') }}" class="btn btn-sm btn-success" title="Nova Chave">
+                                <i class="fas fa-plus"></i> <span class="d-none d-md-inline">Chave</span>
+                            </a>
+                        </div>
                     {% endif %}
 
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Sair</a>

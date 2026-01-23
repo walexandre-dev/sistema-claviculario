@@ -1,31 +1,89 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white text-center">
-                <h4>Acesso ao Sistema</h4>
+
+<style>
+    /* Fundo suave para destacar o card branco */
+    body {
+        background-color: #f4f6f9;
+    }
+    
+    /* Animação suave no foco do input */
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+
+    /* Cabeçalho com gradiente moderno */
+    .login-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border-top-left-radius: 1rem !important;
+        border-top-right-radius: 1rem !important;
+    }
+
+    /* --- NOVO: Efeito de Iluminação no Botão --- */
+    .btn-glow {
+        /* Adiciona uma transição suave para o efeito */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .btn-glow:hover {
+        /* Cria o efeito de "luz". 
+           Os parâmetros são: deslocamento-x, deslocamento-y, desfoque, expansão, cor.
+           Usamos uma cor azul semi-transparente para parecer luz.
+        */
+        box-shadow: 0 0 20px 5px rgba(13, 110, 253, 0.75) !important;
+        /* Opcional: aumenta ligeiramente o botão para dar mais ênfase */
+        transform: translateY(-2px); 
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-90">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+            
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                
+                <div class="card-header login-header text-white text-center py-4">
+                    <h4 class="mb-0 fw-bold">Acesso ao Sistema</h4>
+                    <p class="mb-0 small text-white-50">Bem-vindo de volta</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST">
+                        {% if csrf_token %}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                        {% endif %}
+
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control rounded-3" id="email" name="email" placeholder="nome@exemplo.com" required>
+                            <label for="email">E-mail</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control rounded-3" id="senha" name="senha" placeholder="Senha" required>
+                            <label for="senha">Senha</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-semibold shadow-sm btn-glow">
+                                Entrar
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <a href="#" class="text-decoration-none small text-muted">Esqueceu a senha?</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3 border-0">
+                    <small class="text-muted">Credenciais de teste: <strong>admin@escola.com / 123</strong></small>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">E-mail</label>
-                        <input type="email" class="form-control" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="senha" class="form-label">Senha</label>
-                        <input type="password" class="form-control" name="senha" required>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Entrar</button>
-                    </div>
-                </form>
-            </div>
-            <div class="card-footer text-muted text-center text-small">
-                <small>Use: admin@escola.com / 123</small>
-            </div>
+
         </div>
     </div>
 </div>
+
 {% endblock %}

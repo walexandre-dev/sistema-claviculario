@@ -6,10 +6,10 @@
     <title>Sistema Claviculário</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico.png') }}">
 
     <style>
-        /* --- Estilos Profissionais Personalizados --- */
+        /* --- Estilos - Personalizados --- */
 
         /* Navbar com sombra suave e gradiente sutil */
         .navbar-custom {
@@ -20,15 +20,15 @@
         /* Classe base para os botões do menu */
         .btn-pro {
             transition: all 0.3s ease-in-out;
-            font-weight: 600; /* Fonte um pouco mais grossa */
-            letter-spacing: 0.5px; /* Espaçamento leve entre letras */
-            border-radius: 6px; /* Bordas levemente arredondadas */
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
             position: relative;
             overflow: hidden;
-            border: 1px solid transparent; /* Garante alinhamento */
+            border: 1px solid transparent;
         }
 
-        /* Efeito para botões Outline (Transparente/Branco) - Ex: Sair, Novo Usuário */
+        /* Efeito para botões Outline (Transparente/Branco) */
         .btn-pro-outline {
             border-color: rgba(255,255,255,0.6);
             color: #fff;
@@ -38,12 +38,11 @@
             background-color: rgba(255, 255, 255, 0.1);
             border-color: #fff;
             color: #fff;
-            /* Luz Branca Suave */
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px); /* Flutua levemente */
+            transform: translateY(-2px);
         }
 
-        /* Efeito para botões de Ação (Verde/Sucesso) - Ex: Nova Chave */
+        /* Efeito para botões de Ação (Verde/Sucesso) */
         .btn-pro-success {
             background-color: #198754;
             color: white;
@@ -51,8 +50,7 @@
         }
 
         .btn-pro-success:hover {
-            background-color: #157347; /* Verde levemente mais escuro */
-            /* Luz Verde Intensa */
+            background-color: #157347;
             box-shadow: 0 0 20px rgba(25, 135, 84, 0.6), 0 0 40px rgba(25, 135, 84, 0.3);
             transform: translateY(-2px);
         }
@@ -63,9 +61,114 @@
             letter-spacing: 1px;
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
+
+        /* --- ESTILOS DOS AVISOS (TOASTS) --- */
+        
+        /* Posicionamento no canto superior direito */
+        .toast-container {
+            position: fixed;
+            top: 80px; /* Um pouco abaixo da navbar */
+            right: 20px;
+            z-index: 9999;
+        }
+
+        /* Design do Cartão */
+        .toast {
+            background: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+            min-width: 300px;
+            margin-bottom: 15px; /* Espaço entre toasts */
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* Barra colorida na esquerda para identificar o tipo */
+        .toast.success { border-left: 5px solid #198754; }
+        .toast.danger { border-left: 5px solid #dc3545; }
+        .toast.warning { border-left: 5px solid #ffc107; }
+        .toast.info { border-left: 5px solid #0dcaf0; }
+
+        /* Layout interno */
+        .toast-content {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #333;
+        }
+        
+        .toast-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .toast-body {
+            flex-grow: 1; /* Ocupa o espaço restante */
+            font-size: 0.95rem;
+        }
+
+        /* Barra de Progresso (Timer) */
+        .toast-progress {
+            height: 4px;
+            width: 100%;
+            background-color: rgba(0,0,0,0.05);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            animation: progress-animation 4s linear forwards;
+        }
+
+        /* Animação da barra diminuindo */
+        @keyframes progress-animation {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+        
+        /* Cores da barra de progresso */
+        .success .toast-progress-bar { background-color: #198754; }
+        .danger .toast-progress-bar { background-color: #dc3545; }
+        .warning .toast-progress-bar { background-color: #ffc107; }
+        .info .toast-progress-bar { background-color: #0dcaf0; }
+
     </style>
 </head>
 <body class="bg-light">
+
+    <div class="toast-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set icon = 'check-circle' %}
+                    {% if category == 'danger' %}{% set icon = 'times-circle' %}
+                    {% elif category == 'warning' %}{% set icon = 'exclamation-triangle' %}
+                    {% elif category == 'info' %}{% set icon = 'info-circle' %}
+                    {% endif %}
+
+                    <div class="toast {{ category }} show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-content">
+                            <div class="toast-icon text-{{ category }}">
+                                <i class="fas fa-{{ icon }}"></i>
+                            </div>
+                            <div class="toast-body">
+                                <strong>{{ message }}</strong>
+                            </div>
+                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-progress">
+                            <div class="toast-progress-bar"></div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
     
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
         <div class="container">
@@ -78,7 +181,8 @@
                     </span>
 
                     {% if current_user.tipo == 'Admin' %}
-                        <div class="btn-group me-3 gap-2"> <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-pro btn-pro-outline" title="Novo Usuário">
+                        <div class="btn-group me-3 gap-2"> 
+                            <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-pro btn-pro-outline" title="Novo Usuário">
                                 <i class="fas fa-user-plus"></i> <span class="d-none d-md-inline ms-1">Usuário</span>
                             </a>
                             
@@ -93,21 +197,36 @@
             </div>
 
         </div>
-        
     </nav>
 
     <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} shadow-sm border-0 rounded-3">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
         {% block content %}{% endblock %}
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Seleciona todos os toasts
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            
+            // Inicializa o comportamento do Bootstrap (sem autohide padrão, pois usamos o nosso customizado)
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, { autohide: false });
+            });
+
+            // Configura a remoção após 4 segundos
+            toastElList.forEach(function(toastEl) {
+                setTimeout(function() {
+                    // Efeito visual de fade-out
+                    toastEl.style.opacity = '0';
+                    // Remove do DOM após a transição
+                    setTimeout(() => {
+                        toastEl.remove();
+                    }, 500); 
+                }, 4000); // 4000ms = 4 segundos (tempo da animação da barra)
+            });
+        });
+    </script>
 </body>
 </html>

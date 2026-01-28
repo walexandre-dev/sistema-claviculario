@@ -11,13 +11,11 @@
     <style>
         /* --- Estilos - Personalizados --- */
 
-        /* Navbar com sombra suave e gradiente sutil */
         .navbar-custom {
             background: linear-gradient(135deg, #212529 0%, #343a40 100%);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        /* Classe base para os botões do menu */
         .btn-pro {
             transition: all 0.3s ease-in-out;
             font-weight: 600;
@@ -28,7 +26,6 @@
             border: 1px solid transparent;
         }
 
-        /* Efeito para botões Outline (Transparente/Branco) */
         .btn-pro-outline {
             border-color: rgba(255,255,255,0.6);
             color: #fff;
@@ -42,7 +39,6 @@
             transform: translateY(-2px);
         }
 
-        /* Efeito para botões de Ação (Verde/Sucesso) */
         .btn-pro-success {
             background-color: #198754;
             color: white;
@@ -55,24 +51,20 @@
             transform: translateY(-2px);
         }
 
-        /* Ajuste fino na marca */
         .navbar-brand {
             font-weight: 700;
             letter-spacing: 1px;
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
-        /* --- ESTILOS DOS AVISOS (TOASTS) --- */
-        
-        /* Posicionamento no canto superior direito */
+        /* --- ESTILOS DOS TOASTS (Avisos) --- */
         .toast-container {
             position: fixed;
-            top: 80px; /* Um pouco abaixo da navbar */
+            top: 80px;
             right: 20px;
             z-index: 9999;
         }
 
-        /* Design do Cartão */
         .toast {
             background: white;
             border: none;
@@ -80,62 +72,56 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             overflow: hidden;
             min-width: 300px;
-            margin-bottom: 15px; /* Espaço entre toasts */
-            opacity: 1;
+            margin-bottom: 15px;
             transition: opacity 0.5s ease-out;
         }
 
-        /* Barra colorida na esquerda para identificar o tipo */
         .toast.success { border-left: 5px solid #198754; }
         .toast.danger { border-left: 5px solid #dc3545; }
         .toast.warning { border-left: 5px solid #ffc107; }
         .toast.info { border-left: 5px solid #0dcaf0; }
 
-        /* Layout interno */
-        .toast-content {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            color: #333;
-        }
-        
-        .toast-icon {
-            font-size: 1.5rem;
-            margin-right: 15px;
-        }
+        .toast-content { display: flex; align-items: center; padding: 15px; color: #333; }
+        .toast-icon { font-size: 1.5rem; margin-right: 15px; }
+        .toast-body { flex-grow: 1; font-size: 0.95rem; }
 
-        .toast-body {
-            flex-grow: 1; /* Ocupa o espaço restante */
-            font-size: 0.95rem;
-        }
+        .toast-progress { height: 4px; width: 100%; background-color: rgba(0,0,0,0.05); position: absolute; bottom: 0; left: 0; }
+        .toast-progress-bar { height: 100%; width: 100%; animation: progress-animation 4s linear forwards; }
 
-        /* Barra de Progresso (Timer) */
-        .toast-progress {
-            height: 4px;
-            width: 100%;
-            background-color: rgba(0,0,0,0.05);
-            position: absolute;
-            bottom: 0;
-            left: 0;
-        }
-
-        .toast-progress-bar {
-            height: 100%;
-            width: 100%;
-            animation: progress-animation 4s linear forwards;
-        }
-
-        /* Animação da barra diminuindo */
-        @keyframes progress-animation {
-            0% { width: 100%; }
-            100% { width: 0%; }
-        }
-        
-        /* Cores da barra de progresso */
+        @keyframes progress-animation { 0% { width: 100%; } 100% { width: 0%; } }
         .success .toast-progress-bar { background-color: #198754; }
         .danger .toast-progress-bar { background-color: #dc3545; }
         .warning .toast-progress-bar { background-color: #ffc107; }
         .info .toast-progress-bar { background-color: #0dcaf0; }
+
+        /* --- NOVA ANIMAÇÃO DE PÁGINA (FLUIDEZ) --- */
+        
+        /* 1. Animação de Entrada (Slide Up + Fade In) */
+        .page-transition {
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0; /* Começa invisível para não piscar */
+        }
+
+        @keyframes slideUpFade {
+            0% {
+                opacity: 0;
+                transform: translateY(30px); /* Vem de baixo */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 2. Animação de Saída (Fade Out) - Ativada via JS */
+        body.is-exiting .page-transition {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.98); } /* Diminui levemente */
+        }
 
     </style>
 </head>
@@ -150,20 +136,13 @@
                     {% elif category == 'warning' %}{% set icon = 'exclamation-triangle' %}
                     {% elif category == 'info' %}{% set icon = 'info-circle' %}
                     {% endif %}
-
-                    <div class="toast {{ category }} show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast {{ category }} show" role="alert">
                         <div class="toast-content">
-                            <div class="toast-icon text-{{ category }}">
-                                <i class="fas fa-{{ icon }}"></i>
-                            </div>
-                            <div class="toast-body">
-                                <strong>{{ message }}</strong>
-                            </div>
-                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                            <div class="toast-icon text-{{ category }}"><i class="fas fa-{{ icon }}"></i></div>
+                            <div class="toast-body"><strong>{{ message }}</strong></div>
+                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast"></button>
                         </div>
-                        <div class="toast-progress">
-                            <div class="toast-progress-bar"></div>
-                        </div>
+                        <div class="toast-progress"><div class="toast-progress-bar"></div></div>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -173,33 +152,22 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-key me-2"></i>Claviculário</a>
-
             <div class="d-flex align-items-center">
                 {% if current_user.is_authenticated %}
-                    <span class="navbar-text text-white me-3 d-none d-md-block opacity-75">
-                        Olá, <strong>{{ current_user.nome }}</strong>
-                    </span>
-
+                    <span class="navbar-text text-white me-3 d-none d-md-block opacity-75">Olá, <strong>{{ current_user.nome }}</strong></span>
                     {% if current_user.tipo == 'Admin' %}
                         <div class="btn-group me-3 gap-2"> 
-                            <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-pro btn-pro-outline" title="Novo Usuário">
-                                <i class="fas fa-user-plus"></i> <span class="d-none d-md-inline ms-1">Usuário</span>
-                            </a>
-                            
-                            <a href="{{ url_for('nova_chave') }}" class="btn btn-sm btn-pro btn-pro-success" title="Nova Chave">
-                                <i class="fas fa-plus"></i> <span class="d-none d-md-inline ms-1">Chave</span>
-                            </a>
+                            <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-pro btn-pro-outline link-transition"><i class="fas fa-user-plus"></i> <span class="d-none d-md-inline ms-1">Usuário</span></a>
+                            <a href="{{ url_for('nova_chave') }}" class="btn btn-sm btn-pro btn-pro-success link-transition"><i class="fas fa-plus"></i> <span class="d-none d-md-inline ms-1">Chave</span></a>
                         </div>
                     {% endif %}
-
-                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-pro btn-pro-outline">Sair</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-pro btn-pro-outline link-transition">Sair</a>
                 {% endif %}
             </div>
-
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container page-transition">
         {% block content %}{% endblock %}
     </div>
 
@@ -207,24 +175,51 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Seleciona todos os toasts
+            // --- 1. Lógica dos Toasts (Avisos) ---
             var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-            
-            // Inicializa o comportamento do Bootstrap (sem autohide padrão, pois usamos o nosso customizado)
-            var toastList = toastElList.map(function(toastEl) {
-                return new bootstrap.Toast(toastEl, { autohide: false });
-            });
-
-            // Configura a remoção após 4 segundos
+            var toastList = toastElList.map(function(toastEl) { return new bootstrap.Toast(toastEl, { autohide: false }); });
             toastElList.forEach(function(toastEl) {
                 setTimeout(function() {
-                    // Efeito visual de fade-out
                     toastEl.style.opacity = '0';
-                    // Remove do DOM após a transição
-                    setTimeout(() => {
-                        toastEl.remove();
-                    }, 500); 
-                }, 4000); // 4000ms = 4 segundos (tempo da animação da barra)
+                    setTimeout(() => { toastEl.remove(); }, 500); 
+                }, 4000); 
+            });
+
+            // --- 2. Lógica da Transição de Página (Fluidez) ---
+            
+            // Pega todos os links da página que não abrem em nova aba e não são âncoras vazias
+            const links = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"])');
+
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const targetUrl = this.href;
+
+                    // Se for apenas um link para baixar PDF, não faz transição
+                    if (targetUrl.includes('exportar_pdf')) return;
+
+                    // Previne o carregamento imediato
+                    e.preventDefault();
+
+                    // Adiciona a classe que faz o Fade Out (saída)
+                    document.body.classList.add('is-exiting');
+
+                    // Espera 300ms (tempo da animação) e então muda a página
+                    setTimeout(function() {
+                        window.location.href = targetUrl;
+                    }, 300);
+                });
+            });
+            
+            // Também adiciona efeito nos formulários (Botões de Retirar/Devolver)
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    // Não previne o submit, apenas adiciona o efeito visual
+                    // O formulário vai recarregar a página naturalmente, mas o fade ajuda
+                    if (!this.action.includes('exportar_pdf')) {
+                         document.body.classList.add('is-exiting');
+                    }
+                });
             });
         });
     </script>

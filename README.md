@@ -107,3 +107,7 @@ Após rodar o setup, utilize as credenciais abaixo:
     ├── login.html        # Tela de acesso
     ├── cadastro_usuario.html # Formulário de novos usuários
     └── cadastro_chave.html   # Formulário de novas chaves
+
+## Exibições das telas sistema funcionando. 
+    ![Tela de login](image.png)
+    ![Tela inicial do sistema](image-1.png)

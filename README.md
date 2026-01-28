@@ -1,96 +1,109 @@
-# 🔐 Sistema de Claviculário Digital
+# 🔐 Sistema de Claviculário Digital Inteligente
 
-> **Status:** Protótipo Funcional (MVP)  
-> **Tecnologia:** Python (Flask) + SQLite + Bootstrap 5
+> **Status:** Protótipo Funcional (v2.0)  
+> **Stack:** Python (Flask) | Bootstrap 5 | SQLite
 
-Este projeto é um protótipo de sistema web para gerenciamento e controle de chaves em ambientes corporativos ou educacionais. Ele substitui o livro de papel por um controle digital seguro, permitindo rastrear quem retirou cada chave, quando e garantir que a devolução foi conferida.
+Um sistema web moderno e responsivo para o controle seguro de chaves em ambientes corporativos, escolares ou laboratoriais. O projeto foca em **Experiência do Usuário (UX)** fluida e regras de negócio seguras para rastreabilidade total de quem retirou e devolveu cada chave.
 
 ---
 
-## 🚀 Funcionalidades Principais
+## 🚀 Funcionalidades
 
-* **Dashboard Visual:** Status das chaves em tempo real (Disponível 🟢, Em Uso 🔴, Aguardando Conferência 🟡).
-* **Controle de Acesso:**
-    * **Administrador:** Gerencia usuários, cadastra chaves e confirma devoluções.
-    * **Usuário Comum:** Apenas retira e solicita devolução.
-* **Fluxo de Segurança:** Devoluções feitas por usuários comuns ficam como "Pendentes" até a validação física de um administrador.
-* **Histórico e Relatórios:**
-    * Log completo de retiradas e devoluções.
-    * Filtro por período de datas.
-    * **Exportação para PDF** com um clique.
-* **Gestão de Usuários:** Cadastro de novos usuários com níveis de permissão (apenas Admin).
-* **Interface Responsiva:** Funciona em Desktop e Mobile (Bootstrap 5).
+### 🛡️ Gestão e Segurança
+* **Controle de Acesso (RBAC):** Níveis de permissão distintos para **Administradores** e **Usuários Comuns**.
+* **Fluxo de Validação:** Usuários comuns solicitam a devolução, mas a chave entra em estado **"Pendente"** 🟡 até que um Administrador confirme o recebimento físico.
+* **Gestão de Usuários:** Administradores podem cadastrar novos membros com níveis de acesso específicos.
+* **Gestão de Chaves:** Cadastro e Exclusão de chaves (com trava de segurança: não é possível excluir chaves em uso).
+
+### 💻 Interface e UX (User Experience)
+* **Transições Fluidas:** Navegação entre páginas sem "piscar" (Fade In/Out e Slide Up).
+* **Notificações Modernas (Toasts):** Avisos flutuantes com temporizador visual e desaparecimento automático, sem interromper o layout.
+* **Dashboard Visual:** Cards coloridos indicando status instantâneo (Disponível 🟢, Em Uso 🔴, Pendente 🟡).
+* **Busca em Tempo Real:** Filtragem de chaves sem recarregar a página.
+
+### 📊 Relatórios
+* **Histórico Detalhado:** Registro imutável de quem pegou, hora da retirada e hora da devolução.
+* **Filtros de Data:** Busca por períodos específicos.
+* **Exportação PDF:** Geração automática de relatórios formatados para impressão/arquivamento.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-* **Backend:** Python 3, Flask, Flask-SQLAlchemy (ORM), Flask-Login (Auth).
-* **Frontend:** HTML5, Jinja2, Bootstrap 5 (UI), FontAwesome (Ícones).
-* **Banco de Dados:** SQLite (Arquivo local `banco.db`).
-* **Relatórios:** FPDF (Geração de PDF).
+* **Backend:** Python 3, Flask.
+* **Banco de Dados:** SQLite (com SQLAlchemy ORM).
+* **Autenticação:** Flask-Login (Gestão de sessões e cookies).
+* **Frontend:** HTML5, CSS3, JavaScript Vanilla.
+* **Framework CSS:** Bootstrap 5.3 (Responsividade).
+* **Relatórios:** FPDF (Geração de arquivos PDF).
 
 ---
 
-## 📦 Como Instalar e Rodar
+## 📦 Instalação e Execução
 
 ### Pré-requisitos
 * Python 3.x instalado.
+* Git instalado.
 
 ### Passo a Passo
 
-1.  **Clone ou baixe o projeto:**
+1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/seu-usuario/claviculario-digital.git](https://github.com/seu-usuario/claviculario-digital.git)
-    cd claviculario-digital
+    git clone [https://github.com/SEU-USUARIO/sistema-claviculario.git](https://github.com/SEU-USUARIO/sistema-claviculario.git)
+    cd sistema-claviculario
     ```
 
-2.  **Crie um ambiente virtual (Opcional, mas recomendado):**
+2.  **Crie um ambiente virtual (Recomendado):**
     ```bash
+    # Windows
     python -m venv venv
-    # Windows:
     venv\Scripts\activate
-    # Linux/Mac:
+
+    # Linux/Mac
+    python3 -m venv venv
     source venv/bin/activate
     ```
 
 3.  **Instale as dependências:**
     ```bash
-    pip install flask flask-sqlalchemy flask-login fpdf
+    pip install -r requirements.txt
     ```
+    *(Caso não tenha o arquivo, instale manualmente: `pip install flask flask-sqlalchemy flask-login fpdf`)*
 
-4.  **Execute o servidor:**
+4.  **Inicie o servidor:**
     ```bash
     python app.py
     ```
 
-5.  **Configuração Inicial (Primeira Execução):**
-    Abra o navegador e acesse a rota de configuração para criar o banco de dados e usuários padrão:
-    * Acesse: `http://127.0.0.1:5000/setup`
+5.  **Configuração Inicial (Banco de Dados):**
+    Abra o navegador e acesse a rota de setup para criar o banco e os usuários padrão:
+    * 🔗 `http://127.0.0.1:5000/setup`
 
 ---
 
-## 👤 Como Usar (Logins Padrão)
+## 👤 Acesso ao Sistema (Logins Padrão)
 
-Após rodar o setup, o sistema cria automaticamente dois usuários para teste:
+Após rodar o setup, utilize as credenciais abaixo:
 
-| Nível | E-mail | Senha | Funcionalidades |
+| Nível | E-mail | Senha | Permissões |
 | :--- | :--- | :--- | :--- |
-| **Administrador** | `admin@escola.com` | `123` | Acesso total, confirmar devolução, criar usuários. |
-| **Funcionário** | `joao@escola.com` | `123` | Retirar chaves, solicitar devolução. |
+| **Administrador** | `admin@escola.com` | `123` | Total (Cadastros, Exclusões, Confirmações, PDF) |
+| **Funcionário** | `joao@escola.com` | `123` | Básica (Retirar e Solicitar Devolução) |
 
 ---
 
 ## 📂 Estrutura do Projeto
 
 ```text
-claviculario_app/
+/
+├── app.py                # Núcleo da aplicação (Rotas e Models)
+├── banco.db              # Banco de dados SQLite (gerado no setup)
+├── requirements.txt      # Lista de dependências
+├── .gitignore            # Arquivos ignorados pelo Git
 │
-├── app.py                # Lógica principal (Rotas, Models, Config)
-├── banco.db              # Banco de dados (gerado automaticamente)
-│
-└── templates/            # Telas do sistema (HTML)
-    ├── base.html         # Layout base (Menu e Rodapé)
-    ├── index.html        # Dashboard e Histórico
-    ├── login.html        # Tela de Login
-    └── cadastro_usuario.html # Tela de Cadastro (Admin)
+└── templates/            # Frontend
+    ├── base.html         # Layout mestre (Navbar, Scripts, CSS de Transição)
+    ├── index.html        # Dashboard principal (Abas de Chaves e Histórico)
+    ├── login.html        # Tela de acesso
+    ├── cadastro_usuario.html # Formulário de novos usuários
+    └── cadastro_chave.html   # Formulário de novas chaves

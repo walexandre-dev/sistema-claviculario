@@ -107,7 +107,15 @@ Após rodar o setup, utilize as credenciais abaixo:
     ├── login.html        # Tela de acesso
     ├── cadastro_usuario.html # Formulário de novos usuários
     └── cadastro_chave.html   # Formulário de novas chaves
+```
 
-## Exibições das telas sistema funcionando. 
-    ![Tela de login](image.png)
-    ![Tela inicial do sistema](image-1.png)
+---
+
+## 📸 Telas do Sistema
+
+| Dashboard (Visão Geral) | Login e Segurança |
+|:---:|:---:|
+| ![Dashboard Principal](screenshots/dashboard.png) | ![Tela de Login](screenshots/login.png) |
+
+> *O sistema conta com notificações flutuantes e transições suaves entre as telas.*
+

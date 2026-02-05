@@ -62,7 +62,8 @@
             position: fixed;
             top: 80px;
             right: 20px;
-            z-index: 9999;
+            z-index: 1060; /* Aumentado para ficar acima de Modais do Bootstrap */
+            pointer-events: none; /* CORREÇÃO: Permite clicar através da área vazia do container */
         }
 
         .toast {
@@ -74,6 +75,20 @@
             min-width: 300px;
             margin-bottom: 15px;
             transition: opacity 0.5s ease-out;
+            pointer-events: auto; /* Reativa cliques apenas no toast */
+        }
+
+        /* Responsividade para mobile */
+        @media (max-width: 576px) {
+            .toast-container {
+                width: 100%;
+                right: 0;
+                top: 60px;
+                padding: 0 10px;
+            }
+            .toast {
+                min-width: 100%;
+            }
         }
 
         .toast.success { border-left: 5px solid #198754; }
@@ -96,31 +111,21 @@
 
         /* --- NOVA ANIMAÇÃO DE PÁGINA (FLUIDEZ) --- */
         
-        /* 1. Animação de Entrada (Slide Up + Fade In) */
         .page-transition {
+            opacity: 0;
             animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0; /* Começa invisível para não piscar */
         }
 
         @keyframes slideUpFade {
-            0% {
-                opacity: 0;
-                transform: translateY(30px); /* Vem de baixo */
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* 2. Animação de Saída (Fade Out) - Ativada via JS */
+        /* Classe controlada via JS para saída */
         body.is-exiting .page-transition {
-            animation: fadeOut 0.3s ease-in forwards;
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(0.98); } /* Diminui levemente */
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.3s ease-in, transform 0.3s ease-in;
         }
 
     </style>
@@ -152,17 +157,24 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-key me-2"></i>Claviculário</a>
-            <div class="d-flex align-items-center">
-                {% if current_user.is_authenticated %}
-                    <span class="navbar-text text-white me-3 d-none d-md-block opacity-75">Olá, <strong>{{ current_user.nome }}</strong></span>
-                    {% if current_user.tipo == 'Admin' %}
-                        <div class="btn-group me-3 gap-2"> 
-                            <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-pro btn-pro-outline link-transition"><i class="fas fa-user-plus"></i> <span class="d-none d-md-inline ms-1">Usuário</span></a>
-                            <a href="{{ url_for('nova_chave') }}" class="btn btn-sm btn-pro btn-pro-success link-transition"><i class="fas fa-plus"></i> <span class="d-none d-md-inline ms-1">Chave</span></a>
-                        </div>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <div class="d-flex align-items-center mt-3 mt-lg-0">
+                    {% if current_user.is_authenticated %}
+                        <span class="navbar-text text-white me-3 d-none d-lg-block opacity-75">Olá, <strong>{{ current_user.nome }}</strong></span>
+                        {% if current_user.tipo == 'Admin' %}
+                            <div class="btn-group me-3 gap-2"> 
+                                <a href="{{ url_for('novo_usuario') }}" class="btn btn-sm btn-pro btn-pro-outline link-transition"><i class="fas fa-user-plus"></i> <span class="d-inline ms-1">Usuário</span></a>
+                                <a href="{{ url_for('nova_chave') }}" class="btn btn-sm btn-pro btn-pro-success link-transition"><i class="fas fa-plus"></i> <span class="d-inline ms-1">Chave</span></a>
+                            </div>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-pro btn-pro-outline link-transition">Sair</a>
                     {% endif %}
-                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-pro btn-pro-outline link-transition">Sair</a>
-                {% endif %}
+                </div>
             </div>
         </div>
     </nav>
@@ -178,49 +190,75 @@
             // --- 1. Lógica dos Toasts (Avisos) ---
             var toastElList = [].slice.call(document.querySelectorAll('.toast'));
             var toastList = toastElList.map(function(toastEl) { return new bootstrap.Toast(toastEl, { autohide: false }); });
+            
             toastElList.forEach(function(toastEl) {
+                // Auto-close visual
                 setTimeout(function() {
                     toastEl.style.opacity = '0';
-                    setTimeout(() => { toastEl.remove(); }, 500); 
+                    setTimeout(() => { 
+                        // Usa método nativo do bootstrap para remover corretamente
+                        var toastInstance = bootstrap.Toast.getInstance(toastEl);
+                        if(toastInstance) toastInstance.dispose();
+                        toastEl.remove(); 
+                    }, 500); 
                 }, 4000); 
             });
 
-            // --- 2. Lógica da Transição de Página (Fluidez) ---
+            // --- 2. Lógica da Transição de Página (CORRIGIDA) ---
             
-            // Pega todos os links da página que não abrem em nova aba e não são âncoras vazias
             const links = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"])');
 
             links.forEach(link => {
                 link.addEventListener('click', function(e) {
                     const targetUrl = this.href;
 
-                    // Se for apenas um link para baixar PDF, não faz transição
-                    if (targetUrl.includes('exportar_pdf')) return;
+                    // Ignora links de download, javascript:void ou âncoras puras
+                    if (targetUrl.includes('exportar_pdf') || targetUrl.includes('javascript')) return;
 
-                    // Previne o carregamento imediato
+                    // Adicione a classe 'no-transition' ao link se quiser pular a animação
+                    if (this.classList.contains('no-transition')) return;
+
                     e.preventDefault();
-
-                    // Adiciona a classe que faz o Fade Out (saída)
                     document.body.classList.add('is-exiting');
 
-                    // Espera 300ms (tempo da animação) e então muda a página
                     setTimeout(function() {
                         window.location.href = targetUrl;
                     }, 300);
                 });
             });
             
-            // Também adiciona efeito nos formulários (Botões de Retirar/Devolver)
+            // Tratamento de Formulários
             const forms = document.querySelectorAll('form');
             forms.forEach(form => {
                 form.addEventListener('submit', function(e) {
-                    // Não previne o submit, apenas adiciona o efeito visual
-                    // O formulário vai recarregar a página naturalmente, mas o fade ajuda
-                    if (!this.action.includes('exportar_pdf')) {
-                         document.body.classList.add('is-exiting');
+                    
+                    // CORREÇÃO CRÍTICA 1: Verifica se o form é válido antes de iniciar a transição
+                    if (!this.checkValidity()) {
+                        // Se for inválido, o navegador mostra o erro e NÃO executamos o fade out
+                        return;
                     }
+
+                    // Se for exportação de PDF, não faz fade out
+                    if (this.action.includes('exportar_pdf')) return;
+                    
+                    // Se for um formulário AJAX (ex: dentro de modal que não recarrega), adicione a classe 'ajax-form'
+                    if (this.classList.contains('ajax-form')) return;
+
+                    document.body.classList.add('is-exiting');
                 });
             });
+        });
+
+        // --- 3. CORREÇÃO DO "BFCACHE" (Botão Voltar) ---
+        // Isso impede que a página fique branca se o usuário clicar em Voltar no navegador
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                document.body.classList.remove('is-exiting');
+            }
+        };
+        // Garante a remoção da classe se a página for restaurada do cache
+        window.addEventListener('pageshow', () => {
+             document.body.classList.remove('is-exiting');
         });
     </script>
 </body>

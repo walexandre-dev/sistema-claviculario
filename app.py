@@ -282,10 +282,24 @@ def exportar_pdf():
 
     # Linhas da Tabela
     pdf.set_font("Arial", size=10)
+    
+    # --- CORREÇÃO APLICADA AQUI EMBAIXO ---
     for mov in movimentacoes:
+        # Verifica se a chave ainda existe no banco
+        if mov.chave:
+            nome_da_chave_bd = mov.chave.nome
+        else:
+            nome_da_chave_bd = "Chave Excluída"
+
+        # Verifica se o usuário tem nome (segurança extra)
+        if mov.usuario_nome:
+            nome_usuario_bd = mov.usuario_nome
+        else:
+            nome_usuario_bd = "Desconhecido"
+
         # Tratamento de Strings (remove acentos bugados no FPDF simples)
-        chave_nome = mov.chave.nome.encode('latin-1', 'ignore').decode('latin-1')
-        usuario_nome = mov.usuario_nome.encode('latin-1', 'ignore').decode('latin-1')
+        chave_nome = nome_da_chave_bd.encode('latin-1', 'ignore').decode('latin-1')
+        usuario_nome = nome_usuario_bd.encode('latin-1', 'ignore').decode('latin-1')
         
         data_ret = mov.data_retirada.strftime('%d/%m %H:%M')
         data_dev = mov.data_devolucao.strftime('%d/%m %H:%M') if mov.data_devolucao else "EM ABERTO"
@@ -294,6 +308,7 @@ def exportar_pdf():
         pdf.cell(50, 10, usuario_nome, 1)
         pdf.cell(45, 10, data_ret, 1, 0, 'C')
         pdf.cell(45, 10, data_dev, 1, 1, 'C')
+    # --------------------------------------
 
     # 3. Retornar o arquivo
     from flask import make_response
